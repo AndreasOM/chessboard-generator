@@ -8,7 +8,7 @@ description = "This generates chessboards in various styles with selectable size
 readme = "README.md"
 homepage = "https://github.com/AndreasOM/chessboard-generator"
 repository = "https://github.com/AndreasOM/chessboard-generator"
-keywords = ["graphics", "chess", "chessboard", "generator", "procedural_generation"]
+keywords = ["graphics", "chess", "chessboard", "generator", "procedural"]
 categories = ["graphics"]
 
 exclude = [

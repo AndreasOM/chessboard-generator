@@ -1,6 +1,6 @@
 [package]
 name = "chessboard-generator"
-version = "0.1.0-dev"
+version = "0.1.0-alpha"
 edition = "2021"
 
 [dependencies]

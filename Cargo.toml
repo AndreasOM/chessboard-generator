@@ -1,6 +1,6 @@
 [package]
 name = "chessboard-generator"
-version = "0.1.1-dev"
+version = "0.1.1-alpha"
 edition = "2021"
 
 license = "MIT"

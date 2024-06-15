@@ -1,3 +1,4 @@
+use crate::layers::LayerWood;
 use color_eyre::Result;
 use image::DynamicImage;
 use image::ImageBuffer;
@@ -21,6 +22,7 @@ pub struct ChessboardGenerator {
     colors: [Rgba<f32>; 2],
     buffer: Option<RgbaImage>,
     overlays: Vec<RgbaImage32F>,
+    layers: Vec<Box<LayerWood>>,
 }
 
 impl Default for ChessboardGenerator {
@@ -33,6 +35,7 @@ impl Default for ChessboardGenerator {
             ],
             buffer: None,
             overlays: Vec::default(),
+            layers: Vec::default(),
         }
     }
 }
@@ -45,6 +48,9 @@ impl ChessboardGenerator {
     }
     pub fn set_size(&mut self, size: u32) {
         self.size = size;
+    }
+    pub fn add_layer(&mut self, layer: Box<LayerWood>) {
+        self.layers.push(layer);
     }
     pub fn add_overlay_image(&mut self, img: DynamicImage) -> Result<()> {
         // :TODO: verify sizes match
@@ -64,22 +70,27 @@ impl ChessboardGenerator {
         let mut buffer = RgbaImage32F::new(self.size, self.size);
         let size = self.size as f32;
         let ppc = size / 8.0;
+        let colors = self.colors;
         for (x, y, pixel) in buffer.enumerate_pixels_mut() {
             let fx = x as f32;
             let fy = y as f32;
             let col = (fx / ppc).floor();
             let row = (fy / ppc).floor();
             let p = (row + col).rem_euclid(2.0) as usize;
-            let c = self.colors[p];
+            let mut c = self.colors[p];
             //let r = (255.0 * p as f32) / 255.0;
             //let b = (32.0 * row as f32) / 255.0;
-            *pixel = c;
             //*pixel = image::Rgba([r, 0.0, 0.0, 1.0]);
+            let nx = fx / size;
+            let ny = fy / size;
+            for layer in self.layers.iter() {
+                c = layer.apply(nx, ny, p, &colors, c);
+            }
+            *pixel = c;
         }
 
         for overlay in self.overlays.iter() {
             for (x, y, pixel) in buffer.enumerate_pixels_mut() {
-                //let o = Rgba::from( [ 0.5, 0.0, 0.0, 0.5 ] );
                 let o = overlay.get_pixel(x, y);
                 pixel.blend(&o);
             }

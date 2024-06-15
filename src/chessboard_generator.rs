@@ -1,9 +1,18 @@
+use color_eyre::Result;
 use image::DynamicImage;
 use image::ImageBuffer;
 use image::ImageFormat;
+use image::Pixel;
 use image::Rgba;
 use image::RgbaImage;
 use std::path::Path;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ChessboardGeneratorError {
+    #[error("overlay has wrong size, expected {size}x{size} got {width}x{height}")]
+    WrongOverlaySize { size: u32, width: u32, height: u32 },
+}
 
 type RgbaImage32F = ImageBuffer<Rgba<f32>, Vec<f32>>;
 #[derive(Debug)]
@@ -11,6 +20,7 @@ pub struct ChessboardGenerator {
     size: u32,
     colors: [Rgba<f32>; 2],
     buffer: Option<RgbaImage>,
+    overlays: Vec<RgbaImage32F>,
 }
 
 impl Default for ChessboardGenerator {
@@ -22,6 +32,7 @@ impl Default for ChessboardGenerator {
                 Rgba::from([0.0, 0.0, 0.0, 1.0]),
             ],
             buffer: None,
+            overlays: Vec::default(),
         }
     }
 }
@@ -34,6 +45,20 @@ impl ChessboardGenerator {
     }
     pub fn set_size(&mut self, size: u32) {
         self.size = size;
+    }
+    pub fn add_overlay_image(&mut self, img: DynamicImage) -> Result<()> {
+        // :TODO: verify sizes match
+        if img.width() != self.size || img.height() != self.size {
+            Err(ChessboardGeneratorError::WrongOverlaySize {
+                size: self.size,
+                width: img.width(),
+                height: img.height(),
+            }
+            .into())
+        } else {
+            self.overlays.push(img.into_rgba32f());
+            Ok(())
+        }
     }
     pub fn render(&mut self) {
         let mut buffer = RgbaImage32F::new(self.size, self.size);
@@ -50,6 +75,14 @@ impl ChessboardGenerator {
             //let b = (32.0 * row as f32) / 255.0;
             *pixel = c;
             //*pixel = image::Rgba([r, 0.0, 0.0, 1.0]);
+        }
+
+        for overlay in self.overlays.iter() {
+            for (x, y, pixel) in buffer.enumerate_pixels_mut() {
+                //let o = Rgba::from( [ 0.5, 0.0, 0.0, 0.5 ] );
+                let o = overlay.get_pixel(x, y);
+                pixel.blend(&o);
+            }
         }
         let buffer = DynamicImage::ImageRgba32F(buffer).into_rgba8();
         self.buffer = Some(buffer);

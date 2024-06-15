@@ -7,6 +7,7 @@
 ## Done
 
 ### 2024-06-15
-- [ ] Generate basic chessboard and save it as `.png`. 
+- [x] Generate basic chessboard and save it as `.png`. 
+- [x] Overlay info, e.g. cell names or numbers
 
 ## Released

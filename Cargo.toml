@@ -17,4 +17,6 @@ exclude = [
 ]
 
 [dependencies]
+color-eyre = "0.6.3"
 image = { version = "0.25.1", default-features = false, features = ["png", "rayon"] }
+thiserror = "1.0.61"

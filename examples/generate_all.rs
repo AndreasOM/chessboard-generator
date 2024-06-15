@@ -1,8 +1,9 @@
+use color_eyre::Result;
 use std::path::Path;
 
 use chessboard_generator::ChessboardGenerator;
 
-fn main() {
+fn main() -> Result<()> {
     let mut cg = ChessboardGenerator::default();
 
     cg.set_size(584);
@@ -12,6 +13,14 @@ fn main() {
     let mut cg = ChessboardGenerator::new(&[[234, 233, 213, 255], [73, 116, 150, 255]]);
 
     cg.set_size(584);
+
+    // overlay another image on top
+    let legend_buffer = include_bytes!("legend.png");
+    let legend = image::load_from_memory(legend_buffer).expect("Can load legend from memory");
+    cg.add_overlay_image(legend)?;
+
     cg.render(); // .await
     cg.save_as_png(Path::new("chessboard_blue.png"));
+
+    Ok(())
 }

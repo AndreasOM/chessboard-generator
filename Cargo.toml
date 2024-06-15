@@ -1,7 +1,20 @@
 [package]
 name = "chessboard-generator"
-version = "0.1.1-dev"
+version = "0.1.0-dev"
 edition = "2021"
+
+license = "MIT"
+description = "This generates chessboards in various styles with selectable sizes and colors."
+readme = "README.md"
+homepage = "https://github.com/AndreasOM/chessboard-generator"
+repository = "https://github.com/AndreasOM/chessboard-generator"
+keywords = ["graphics", "chess", "chessboard", "generator", "procedural_generation"]
+categories = ["graphics"]
+
+exclude = [
+    ".github",
+    ".gitignore",
+]
 
 [dependencies]
 image = { version = "0.25.1", default-features = false, features = ["png", "rayon"] }
